@@ -36,3 +36,11 @@ if (Qt6Network_FOUND)
 endif()
 
 target_compile_definitions(Tool PRIVATE TOOL_VERSION="${PROJECT_VERSION}")
+
+install(TARGETS Tool RUNTIME DESTINATION bin)
+
+qt_generate_deploy_app_script(TARGET Tool OUTPUT_SCRIPT INSTALL_SCRIPT NO_TRANSLATIONS)
+install(SCRIPT ${INSTALL_SCRIPT})
+
+set(CPACK_GENERATOR ZIP TGZ)
+include(CPack)
