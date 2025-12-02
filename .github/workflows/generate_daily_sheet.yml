@@ -1,0 +1,45 @@
+name: Daily sheet generation
+
+on:
+  workflow_dispatch:  # Enables manual trigger from GitHub UI
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.9.0'
+          host: 'linux'
+          target: 'desktop'
+          arch: 'linux_gcc_64'
+
+      - name: Configure CMake
+        run: cmake -S ${{github.workspace}} -B ${{env.BUILD_DIR}} -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build ${{env.BUILD_DIR}} --target all
+
+      - name: Generating today's sheet...
+        run: |
+          cd ${{env.BUILD_DIR}}
+          ./idcam-day --technician '${{secrets.TECHNIAN}}' --region '${{secrets.REGION}}' --workspace '${{secrets.CLOCKIFY_WORKSPACE}}' --token '${{CLOCKIFY_TOKEN}}'
+
+      - name: Sending daily sheet though mail
+        uses: dawidd6/action-send-mail@v3
+        # continue-on-error: true
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{secrets.MAIL_ADDRESS}}
+          password: ${{secrets.MAIL_PASSWORD}}
+          subject: "${{secrets.TECHNIAN}} sheet generated !"
+          to: ${{secrets.MAIL_ADDRESS}}
+          from: Amadou Benjamain
+          body: "Hey, your daily sheet had been generated !\n\nLooks at the attachment(s)."
+          attachments: ${{env.BUILD_DIR}}/*.xlsx
