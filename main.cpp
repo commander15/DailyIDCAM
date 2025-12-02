@@ -1,4 +1,5 @@
 #include <QCoreApplication>
+#include <QLocale>
 #include <QTextStream>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
@@ -17,6 +18,9 @@ int main(int argc, char *argv[])
     QCoreApplication app(argc, argv);
     app.setApplicationName("idcam-daily");
     app.setApplicationVersion(TOOL_VERSION);
+
+    // Ensuring we are in Cameroon
+    QLocale::setDefault(QLocale(QLocale::French, QLocale::Cameroon));
 
     QTextStream out(stdout);
 
