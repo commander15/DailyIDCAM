@@ -7,8 +7,8 @@ jobs:
   build:
     runs-on: ubuntu-24.04
 
-  env:
-    BUILD_DIR: ${{github.workspace}}/build
+    env:
+      BUILD_DIR: ${{github.workspace}}/build
 
     steps:
       - name: Checkout code
