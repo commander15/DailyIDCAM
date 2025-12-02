@@ -2,6 +2,9 @@ name: Daily sheet generation
 
 on:
   workflow_dispatch:  # Enables manual trigger from GitHub UI
+  schedule:
+    # - cron: '0 13 * * 1-5'
+    - cron: '55 16 * * 1-5'
 
 jobs:
   build:
@@ -41,7 +44,7 @@ jobs:
           server_port: 465
           username: ${{secrets.MAIL_ADDRESS}}
           password: ${{secrets.MAIL_PASSWORD}}
-          subject: "${{secrets.TECHNIAN}} sheet generated !"
+          subject: "${{secrets.TECHNICIAN}} sheet generated !"
           to: ${{secrets.MAIL_ADDRESS}}
           from: Amadou Benjamain
           body: "Hey, your daily sheet had been generated !\n\nLooks at the attachment(s)."
