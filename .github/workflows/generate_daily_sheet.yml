@@ -4,7 +4,7 @@ on:
   workflow_dispatch:  # Enables manual trigger from GitHub UI
   schedule:
     # - cron: '0 13 * * 1-5'
-    - cron: '55 16 * * 1-5'
+    - cron: '56 15 * * 1-5'
 
 jobs:
   build:
