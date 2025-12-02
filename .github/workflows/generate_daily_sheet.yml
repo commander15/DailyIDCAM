@@ -31,7 +31,7 @@ jobs:
       - name: Generating today's sheet...
         run: |
           cd ${{env.BUILD_DIR}}
-          ./idcam-day --technician '${{secrets.TECHNIAN}}' --region '${{secrets.REGION}}' --workspace '${{secrets.CLOCKIFY_WORKSPACE}}' --token '${{secrets.CLOCKIFY_TOKEN}}'
+          ./idcam-day --technician '${{secrets.TECHNICIAN}}' --region '${{secrets.REGION}}' --workspace '${{secrets.CLOCKIFY_WORKSPACE}}' --token '${{secrets.CLOCKIFY_TOKEN}}'
 
       - name: Sending daily sheet though mail
         uses: dawidd6/action-send-mail@v3
