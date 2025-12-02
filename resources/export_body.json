@@ -1,0 +1,25 @@
+{
+	"amounts": [],
+	"amountShown": "HIDE_AMOUNT",
+	"dateRangeEnd": "{END_DATE}",
+	"dateRangeStart": "{START_DATE}",
+	"description": "",
+	"detailedFilter": {
+		"auditFilter": null,
+		"options": {
+			"totals": "CALCULATE"
+		},
+		"page": 1,
+		"pageSize": 50,
+		"quickbooksSelectType": null,
+		"sortColumn": "DATE"
+	},
+	"exportType": "XLSX",
+	"kioskIds": [],
+	"rounding": false,
+	"sortOrder": "ASCENDING",
+	"timeViewMode": "TIME_SENSITIVE_VIEW",
+	"userLocale": "FR",
+	"withoutDescription": false,
+	"zoomLevel": "WEEK"
+}
