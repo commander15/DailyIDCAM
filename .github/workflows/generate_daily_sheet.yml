@@ -7,6 +7,9 @@ jobs:
   build:
     runs-on: ubuntu-24.04
 
+  env:
+    BUILD_DIR: ${{github.workspace}}/build
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
