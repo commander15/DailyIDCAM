@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.30)
 
-project(DailyIDCAM VERSION 1.0.0)
+project(DailyIDCAM VERSION 1.0.1)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
