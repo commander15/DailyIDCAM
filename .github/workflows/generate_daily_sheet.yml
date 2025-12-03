@@ -13,18 +13,20 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - name: Getting tool...
+      - name: Get tool
         run: |
           wget https://github.com/commander15/DailyIDCAM/releases/download/v${{ env.TOOL_VERSION }}/DailyIDCAM-${{ env.TOOL_VERSION }}-Linux.tar.gz
           tar -xf DailyIDCAM-${{ env.TOOL_VERSION }}-Linux.tar.gz
           mv DailyIDCAM-${{ env.TOOL_VERSION }}-Linux DailyIDCAM
 
-      - name: Generating today's sheet...
+      - name: Install dependencies
+
+      - name: Generate today's sheet
         run: |
           cd DailyIDCAM/bin
           ./idcam-day --output ${{ github.workspace }} --technician '${{ secrets.TECHNICIAN }}' --region '${{ secrets.REGION }}' --workspace '${{ secrets.CLOCKIFY_WORKSPACE }}' --token '${{ secrets.CLOCKIFY_TOKEN }}'
 
-      - name: Sending daily sheet though mail
+      - name: Send daily sheet though mail
         uses: dawidd6/action-send-mail@v3
         # continue-on-error: true
         with:
