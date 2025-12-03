@@ -21,8 +21,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt update
-          sudo apt install -y libqt6network6t64 libopengl0
+          sudo apt-get update
+          sudo apt-get install -y libgl1-mesa-dev libopengl0
 
       - name: Generate today's sheet
         run: |
