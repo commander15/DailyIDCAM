@@ -133,7 +133,7 @@ jobs:
 
   notify:
     needs: create-release
-    runs-on: ${{env.VM_OS}}
+    runs-on: ubuntu-24.04
     steps:
       - name: Send notification email
         uses: dawidd6/action-send-mail@v3
