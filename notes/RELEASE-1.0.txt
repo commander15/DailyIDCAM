@@ -1,0 +1,3 @@
+Daily IDCAM 1.0 released !
+
+This is the first release.

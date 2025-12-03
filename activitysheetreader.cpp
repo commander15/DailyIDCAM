@@ -1,5 +1,7 @@
 #include "activitysheetreader.h"
 
+#include "utils.h"
+
 #include <QFile>
 #include <QRegularExpression>
 
@@ -31,6 +33,8 @@ ActivitySheet ActivitySheetReader::read(QIODevice *device)
         const QString task = doc.read(row, 4).toString();
         if (task == "Intervention")
             sheet.interventions.append(readIntervention(doc, row));
+        else if (task == "Remplacement")
+            sheet.replacements.append(readReplacement(doc, row));
     }
 
     return sheet;
@@ -38,8 +42,6 @@ ActivitySheet ActivitySheetReader::read(QIODevice *device)
 
 Intervention ActivitySheetReader::readIntervention(Document &doc, int row)
 {
-    static const QRegularExpression ticketExpr(R"(^L\dISD-\d+$)");
-
     const QString fullDescription = doc.read(row, 3).toString();
     const int frontier = fullDescription.indexOf(":");
     const QString title = fullDescription.left(frontier);
@@ -51,38 +53,36 @@ Intervention ActivitySheetReader::readIntervention(Document &doc, int row)
     intervention.office = doc.read(row, 2).toString();
     intervention.startTime = doc.read(row, 10).toTime();
     intervention.endTime = doc.read(row, 12).toTime();
-
-    const QString subSystem = doc.read(row, 1).toString();
-    if (subSystem == "Enrôlement")
-        intervention.subSystem = Intervention::Enrolment;
-    else if (subSystem == "Pré-enrôlement")
-        intervention.subSystem = Intervention::PreEnrolment;
-    else if (subSystem == "Retrait")
-        intervention.subSystem = Intervention::Withdrawal;
-    else if (subSystem == "Validation")
-        intervention.subSystem = Intervention::Validation;
-    else if (subSystem == "Production")
-        intervention.subSystem = Intervention::Production;
-    else if (subSystem == "Infrastructure")
-        intervention.subSystem = Intervention::Infrastructure;
+    intervention.subSystem = Utils::subSystem(doc.read(row, 1).toString());
 
     const QStringList tags = doc.read(row, 8).toString().split(", ", Qt::SkipEmptyParts);
     for (const QString &tag : tags) {
-        if (ticketExpr.matchView(tag).hasMatch())
-            intervention.ticket = tag.toUpper();
-        else if (tag == "logiciel")
-            intervention.type = Intervention::Software;
-        else if (tag == "matériel")
-            intervention.type = Intervention::Hardware;
-        else if (tag == "remplacement")
-            intervention.type = Intervention::Replacement;
-        else if (tag == "résolu")
-            intervention.status = Intervention::Solved;
-        else if (tag == "en cours de traitement")
-            intervention.status = Intervention::Processing;
-        else if (tag == "non résolu")
-            intervention.status = Intervention::Unsolved;
+        // First we check if it's not a ticket number
+        const QString ticket = Utils::ticketNumber(tag);
+        if (!ticket.isEmpty()) {
+            intervention.ticket = ticket;
+        }
+
+        // Next, we check if it's not an intervention type
+        Intervention::InterventionType type = Utils::interventionType(tag);
+        if (type != Intervention::UnknownType) {
+            intervention.type = type;
+            continue;
+        }
+
+        // Later, we check if it's not an intervention status
+        Intervention::Status status = Utils::interventionStatus(tag);
+        if (status != Intervention::UnknownStatus) {
+            intervention.status = status;
+            continue;
+        }
     }
 
     return intervention;
+}
+
+HardwareReplacement ActivitySheetReader::readReplacement(QXlsx::Document &doc, int row)
+{
+    HardwareReplacement replacement;
+    return replacement;
 }

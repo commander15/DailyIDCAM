@@ -24,6 +24,7 @@ qt_add_executable(Tool
     res.qrc
     activitysheetwriter.h activitysheetwriter.cpp
     activitysheetreader.h activitysheetreader.cpp
+    utils.h utils.cpp
 )
 
 set_target_properties(Tool PROPERTIES OUTPUT_NAME idcam-day)
@@ -44,3 +45,6 @@ install(SCRIPT ${INSTALL_SCRIPT})
 
 set(CPACK_GENERATOR ZIP TGZ)
 include(CPack)
+
+# Just make testing pass
+enable_testing()

@@ -16,7 +16,8 @@ public:
     ActivitySheet read(QIODevice *device);
 
 private:
-    Intervention readIntervention(QXlsx::Document& doc, int row);
+    Intervention readIntervention(QXlsx::Document &doc, int row);
+    HardwareReplacement readReplacement(QXlsx::Document &doc, int row);
 };
 
 #endif // ACTIVITYSHEETREADER_H

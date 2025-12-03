@@ -50,6 +50,27 @@ public:
     QString region;
 };
 
+class HardwareReplacement
+{
+public:
+    enum Type {
+        UnknownType,
+        TinyPC
+    };
+
+    enum Status { Ok, Nok };
+
+    QString oldSerial;
+    QString newSerial;
+    int quantity = 0;
+    QString reason;
+    QString location;
+    QString office;
+    Intervention::SubSystem subSystem = Intervention::UnknownSystem;
+    Type type = UnknownType;
+    Status status = Nok;
+};
+
 class ActivitySheet
 {
 public:
@@ -57,12 +78,14 @@ public:
 
     int interventionCount(Intervention::InterventionType type, Intervention::SubSystem subSystem) const;
     QTime workOrdersDuration() const;
+    int replacementCount(Intervention::SubSystem system1, Intervention::SubSystem system2 = Intervention::UnknownSystem) const;
 
     QDate date;
     QString technician;
     QString region;
     QList<WorkOrder> workOrders;
     QList<Intervention> interventions;
+    QList<HardwareReplacement> replacements;
 };
 
 #endif // ACTIVITYSHEET_H
