@@ -12,7 +12,7 @@ ActivitySheetWriter::ActivitySheetWriter() {}
 
 bool ActivitySheetWriter::save(const QString &fileName, const ActivitySheet &sheet)
 {
-    Document doc(":/resources/IDCAM_Fiche_Activité_Journaliere..xlsx");
+    Document doc(":/resources/IDCAM_Fiche_Activite_Journaliere.xlsx");
     if (!doc.load())
         return false;
 

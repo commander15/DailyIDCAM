@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>resources/IDCAM_Fiche_Activité_Journaliere..xlsx</file>
+        <file>resources/IDCAM_Fiche_Activite_Journaliere.xlsx</file>
         <file>resources/export_body.json</file>
     </qresource>
 </RCC>
