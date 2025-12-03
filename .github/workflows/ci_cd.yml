@@ -101,7 +101,7 @@ jobs:
         id: release_note
         run: |
           wget https://raw.githubusercontent.com/${{github.repository}}/refs/heads/main/notes/RELEASE-${{ steps.tag.outputs.version }}.txt
-          echo 'file=RELEASE-${{ steps.tag.outputs.version }}.txt' >> $GITHUB_OUTPUT
+          echo "file=RELEASE-${{ steps.tag.outputs.version }}.txt" >> $GITHUB_OUTPUT
 
           NOTES_FILE="RELEASE-${{ steps.tag.outputs.version }}.txt"
           if [ ! -f "$NOTES_FILE" ]; then
