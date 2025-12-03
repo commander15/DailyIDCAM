@@ -20,6 +20,10 @@ jobs:
           mv DailyIDCAM-${{ env.TOOL_VERSION }}-Linux DailyIDCAM
 
       - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt upgrade
+          sudo apt install libopengl0
 
       - name: Generate today's sheet
         run: |
