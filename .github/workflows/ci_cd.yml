@@ -107,7 +107,7 @@ jobs:
             echo "Release notes file $NOTES_FILE not found!"
             echo "content=No release notes found for version ${{ steps.tag.outputs.version }}" >> $GITHUB_OUTPUT
           else
-            CONTENT=$(cat "$NOTES_FILE" | sed 's/"/\\"/g' | sed 's/$/\\n/' | tr -d '\n')
+            CONTENT=$(cat "$NOTES_FILE")
             echo "content=$CONTENT" >> $GITHUB_OUTPUT
           fi
 
@@ -147,8 +147,8 @@ jobs:
           from: ${{ secrets.MAIL_ADDRESS }}
           body: |
             Hello,
-
             A new version of ${{ env.PACKAGE_NAME }} has been released!
+
             Version: ${{ needs.create-release.outputs.version }}
             Release page: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}
 
