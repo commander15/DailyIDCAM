@@ -101,7 +101,7 @@ jobs:
         id: release_note
         run: |
           wget https://raw.githubusercontent.com/${{github.repository}}/refs/heads/main/notes/RELEASE-${{ steps.tag.outputs.version }}.txt
-          echo 'file=RELEASE-${{ steps.tag.outputs.version }}.txt'
+          echo 'file=RELEASE-${{ steps.tag.outputs.version }}.txt' >> $GITHUB_OUTPUT
 
           NOTES_FILE="RELEASE-${{ steps.tag.outputs.version }}.txt"
           if [ ! -f "$NOTES_FILE" ]; then
@@ -109,7 +109,7 @@ jobs:
             echo "content=No release notes found for version ${{ steps.tag.outputs.version }}" >> $GITHUB_OUTPUT
           else
             CONTENT=$(cat "$NOTES_FILE")
-            echo "content=$CONTENT" >> $GITHUB_OUTPUT
+            echo "content=\"$CONTENT\"" >> $GITHUB_OUTPUT
           fi
 
       - name: Download all artifacts
