@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Getting tool...
         run: |
-          wget wget https://github.com/commander15/DailyIDCAM/releases/download/v${{ env.TOOL_VERSION }}/DailyIDCAM-${{ env.TOOL_VERSION }}-Linux.tar.gz
+          wget https://github.com/commander15/DailyIDCAM/releases/download/v${{ env.TOOL_VERSION }}/DailyIDCAM-${{ env.TOOL_VERSION }}-Linux.tar.gz
           tar -xf DailyIDCAM-${{ env.TOOL_VERSION }}-Linux.tar.gz
           mv DailyIDCAM-${{ env.TOOL_VERSION }}-Linux DailyIDCAM
 
