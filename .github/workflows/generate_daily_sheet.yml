@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install libopengl0
+          sudo apt install -y libqt6network6t64 libopengl0
 
       - name: Generate today's sheet
         run: |
