@@ -3,9 +3,7 @@ name: Daily sheet generation
 on:
   workflow_dispatch:  # Enables manual trigger from GitHub UI
   schedule:
-    - cron: '45 12 * * 1-5'
-    - cron: '0 13 * * 1-5'
-    - cron: '3 15 * * 1-5'
+    - cron: '15 12 * * 1-5'
 
 env:
   TOOL_VERSION: 1.0.1
@@ -33,7 +31,7 @@ jobs:
 
       - name: Send daily sheet though mail
         uses: dawidd6/action-send-mail@v3
-        # continue-on-error: true
+        continue-on-error: true
         with:
           server_address: smtp.gmail.com
           server_port: 465
@@ -44,3 +42,10 @@ jobs:
           from: ${{ secrets.TECHNICIAN }}
           body: "Hey, your daily sheet had been generated !\n\nLooks at the attachment(s)."
           attachments: ${{ github.workspace }}/*.xlsx
+
+      - name: Send dayly sheet though Whatsapp
+        uses: kaviadigdarshan/whatsapp-actions@main
+        env:
+          ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+          TO_WHATSAPP_NUMBER: ${{ secrets.WHATSAPP_NUMBER }}
