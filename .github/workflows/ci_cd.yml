@@ -108,7 +108,7 @@ jobs:
             echo "content=No release notes found for version ${{ steps.tag.outputs.version }}" >> $GITHUB_OUTPUT
           else
             CONTENT=$(cat "$NOTES_FILE")
-            echo "content=$CONTENT" >> $GITHUB_OUTPUT
+            echo 'content="$CONTENT"' >> $GITHUB_OUTPUT
           fi
 
       - name: Download all artifacts
