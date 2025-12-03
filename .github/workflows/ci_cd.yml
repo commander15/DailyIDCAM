@@ -136,6 +136,9 @@ jobs:
     needs: create-release
     runs-on: ubuntu-24.04
     steps:
+      - name: Preparing email
+        run: echo "${{ needs.create-release.outputs.release_note }}"
+
       - name: Send notification email
         uses: dawidd6/action-send-mail@v3
         with:
