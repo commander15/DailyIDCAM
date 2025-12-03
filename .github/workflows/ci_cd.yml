@@ -77,7 +77,7 @@ jobs:
   create-release:
     if: startsWith(github.ref, 'refs/tags/')
     needs: build
-    runs-on: ${{env.VM_OS}}
+    runs-on: ubuntu-24.04
 
     permissions:
       contents: write  # Needed for creating releases
