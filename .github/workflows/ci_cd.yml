@@ -101,6 +101,7 @@ jobs:
         id: release_note
         run: |
           wget https://raw.githubusercontent.com/${{github.repository}}/refs/heads/main/notes/RELEASE-${{ steps.tag.outputs.version }}.txt
+          echo 'file=RELEASE-${{ steps.tag.outputs.version }}.txt'
 
           NOTES_FILE="RELEASE-${{ steps.tag.outputs.version }}.txt"
           if [ ! -f "$NOTES_FILE" ]; then
@@ -123,7 +124,7 @@ jobs:
         with:
           name: ${{ env.PACKAGE_NAME }} ${{ steps.tag.outputs.version }}
           tag_name: ${{ github.ref_name }}        # Use actual tag (e.g. v1.4.2)
-          body: ${{ steps.release_notes.outputs.content }}
+          body_path: ${{ steps.release_notes.outputs.file }}
           draft: false
           prerelease: false
           fail_on_unmatched_files: true
