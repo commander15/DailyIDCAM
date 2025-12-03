@@ -12,14 +12,14 @@ env:
   VM_OS: ubuntu-24.04
 
 jobs:
-  build:
+  cross-build:
     strategy:
       matrix:
         include:
           - platform: Windows
             os: windows-2022
             host: windows
-            arch: win64_msvc2019_64
+            arch: win64_msvc2022_64
             target: desktop
           - platform: Linux
             os: ubuntu-24.04
