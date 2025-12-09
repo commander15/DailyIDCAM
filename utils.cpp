@@ -107,7 +107,7 @@ QString Utils::hardwareStatusString(HardwareReplacement::Status status)
 
 QString Utils::ticketNumber(const QString &str)
 {
-    static const QRegularExpression ticketExpr(R"(^L\dISD-\d+$)", QRegularExpression::CaseInsensitiveOption);
+    static const QRegularExpression ticketExpr(R"(^L\dISD-\d+|IHS-\d+$)", QRegularExpression::CaseInsensitiveOption);
     const QRegularExpressionMatch match = ticketExpr.match(str.trimmed());
 
     return match.hasMatch() ? match.captured(0) : QString();
