@@ -2,6 +2,15 @@
 
 #include <QTime>
 
+
+QTime Intervention::duration() const
+{
+    const int hour = endTime.hour() - startTime.hour();
+    const int minute = endTime.minute() - startTime.minute();
+    const int second = endTime.second() - startTime.second();
+    return QTime(hour, minute, second);
+}
+
 ActivitySheet::ActivitySheet() {}
 
 int ActivitySheet::interventionCount(Intervention::InterventionType type, Intervention::SubSystem subSystem) const

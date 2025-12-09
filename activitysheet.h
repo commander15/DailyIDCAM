@@ -40,6 +40,8 @@ public:
     SubSystem subSystem = UnknownSystem;
     InterventionType type = UnknownType;
     Status status = UnknownStatus;
+
+    QTime duration() const;
 };
 
 class WorkOrder
