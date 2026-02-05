@@ -75,9 +75,9 @@ void ActivitySheetWriter::writeInterventions(QXlsx::Document &doc, const QString
         doc.write(row, 6, intervention.title);
         doc.write(row, 7, intervention.description);
         doc.write(row, 8, intervention.ticket);
-        doc.write(row, 9, intervention.startTime);
+        doc.write(row, 9, intervention.startTime.toString("hh:mm"));
         doc.write(row, 10, Utils::interventionStatusString(intervention.status));
-        doc.write(row, 11, intervention.endTime);
+        doc.write(row, 11, intervention.endTime.toString("hh:mm"));
 
         // Increment counter
         ++count;
