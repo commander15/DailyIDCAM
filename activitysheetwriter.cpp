@@ -4,46 +4,59 @@
 
 #include <QFile>
 
-#include <xlsxdocument.h>
+#include <OpenXLSX.hpp>
 
-using namespace QXlsx;
+using namespace OpenXLSX;
 
 ActivitySheetWriter::ActivitySheetWriter() {}
 
 bool ActivitySheetWriter::save(const QString &fileName, const ActivitySheet &sheet)
 {
-    Document doc(":/resources/IDCAM_Fiche_Activite_Journaliere.xlsx");
-    if (!doc.load())
+    if (QFile::exists(fileName))
+        QFile::remove(fileName);
+
+    QFile::copy(":/resources/IDCAM_Fiche_Activite_Journaliere.xlsx", fileName);
+
+    XLDocument doc(fileName.toStdString());
+    if (!doc.isOpen())
         return false;
 
+    XLWorksheet excel = doc.workbook().worksheet(2);
+
     // Setting date
-    doc.write("B2", sheet.date.toString("dd/MM/yyyy"));
+    excel.cell("B2").value().set<std::string>(sheet.date.toString("dd/MM/yyyy").toStdString());
 
     // Filling first table
-    writeInterventionStats(doc, sheet);
+    writeInterventionStats(excel, sheet);
 
     // Filling second table
-    doc.write("A13", sheet.region);
-    doc.write("B13", sheet.technician);
-    doc.write("C13", sheet.workOrders.count());
-    doc.write("D13", sheet.workOrdersDuration());
+    excel.cell("A13").value().set<std::string>(sheet.region.toStdString());
+    excel.cell("B13").value().set<std::string>(sheet.technician.toStdString());
+    excel.cell("C13").value().set<int>(sheet.workOrders.count());
+    excel.cell("D13").value().set<std::string>(sheet.workOrdersDuration().toString().toStdString());
 
     // Filling third table, starting filling at row 18
-    writeInterventions(doc, sheet.technician, 18, sheet.interventions);
+    writeInterventions(excel, sheet.technician, 18, sheet.interventions);
 
     // We write replacements, starting at row 29
-    writeReplacements(doc, sheet.date, 29, sheet.replacements);
+    writeReplacements(excel, sheet.date, 29, sheet.replacements);
 
-    return doc.saveAs(fileName);
+    try {
+        doc.saveAs(fileName.toStdString(), true);
+        return true;
+    } catch (const XLException &) {
+        return false;
+    }
 }
 
-void ActivitySheetWriter::writeInterventionStats(QXlsx::Document &doc, const ActivitySheet &sheet)
+void ActivitySheetWriter::writeInterventionStats(XLWorksheet &doc, const ActivitySheet &sheet)
 {
     // Filling region
-    doc.write("A6", sheet.region);
+    doc.cell("A6").value().set(sheet.region.toStdString());
 
     auto fillFirst = [&doc, &sheet](const char *cell, Intervention::InterventionType type, Intervention::SubSystem subSystem, Intervention::SubSystem subSystem2 = Intervention::UnknownSystem) {
-        doc.write(cell, sheet.interventionCount(type, subSystem) + sheet.interventionCount(type, subSystem2));
+        const int value = sheet.interventionCount(type, subSystem) + sheet.interventionCount(type, subSystem2);
+        doc.cell(cell).value().set<int>(value);
     };
 
     fillFirst("C6", Intervention::Software, Intervention::PreEnrolment);
@@ -56,35 +69,35 @@ void ActivitySheetWriter::writeInterventionStats(QXlsx::Document &doc, const Act
     fillFirst("F7", Intervention::Hardware, Intervention::Validation);
     fillFirst("G7", Intervention::Hardware, Intervention::Production);
     fillFirst("H7", Intervention::Hardware, Intervention::Infrastructure);
-    doc.write("C8", sheet.replacementCount(Intervention::PreEnrolment));
-    doc.write("D8", sheet.replacementCount(Intervention::Enrolment, Intervention::Withdrawal));
-    doc.write("F8", sheet.replacementCount(Intervention::Validation));
-    doc.write("G8", sheet.replacementCount(Intervention::Production));
-    doc.write("H8", sheet.replacementCount(Intervention::Infrastructure));
+    doc.cell("C8").value().set(sheet.replacementCount(Intervention::PreEnrolment));
+    doc.cell("D8").value().set(sheet.replacementCount(Intervention::Enrolment, Intervention::Withdrawal));
+    doc.cell("F8").value().set(sheet.replacementCount(Intervention::Validation));
+    doc.cell("G8").value().set(sheet.replacementCount(Intervention::Production));
+    doc.cell("H8").value().set(sheet.replacementCount(Intervention::Infrastructure));
 }
 
-void ActivitySheetWriter::writeInterventions(QXlsx::Document &doc, const QString &technician, int row, const QList<Intervention> &interventions)
+void ActivitySheetWriter::writeInterventions(XLWorksheet &doc, const QString &technician, int row, const QList<Intervention> &interventions)
 {
     int count = 0;
 
     for (const Intervention &intervention : interventions) {
-        doc.write(row, 2, technician);
-        doc.write(row, 3, Utils::interventionTypeString(intervention.type));
-        doc.write(row, 4, Utils::subSystemString(intervention.subSystem));
-        doc.write(row, 5, intervention.office);
-        doc.write(row, 6, intervention.title);
-        doc.write(row, 7, intervention.description);
-        doc.write(row, 8, intervention.ticket);
-        doc.write(row, 9, intervention.startTime.toString("hh:mm"));
-        doc.write(row, 10, Utils::interventionStatusString(intervention.status));
-        doc.write(row, 11, intervention.endTime.toString("hh:mm"));
+        doc.cell(row, 2).value().set(technician.toStdString());
+        doc.cell(row, 3).value().set(Utils::interventionTypeString(intervention.type).toStdString());
+        doc.cell(row, 4).value().set(Utils::subSystemString(intervention.subSystem).toStdString());
+        doc.cell(row, 5).value().set(intervention.office.toStdString());
+        doc.cell(row, 6).value().set(intervention.title.toStdString());
+        doc.cell(row, 7).value().set(intervention.description.toStdString());
+        doc.cell(row, 8).value().set(intervention.ticket.toStdString());
+        doc.cell(row, 9).value().set(intervention.startTime.toString("hh:mm").toStdString());
+        doc.cell(row, 10).value().set(Utils::interventionStatusString(intervention.status).toStdString());
+        doc.cell(row, 11).value().set(intervention.endTime.toString("hh:mm").toStdString());
 
         // Increment counter
         ++count;
 
         // We allow a single record overflow
         if (count == 6) {
-            doc.write(row, 1, count);
+            doc.cell(row, 1).value().set(count);
             break;
         }
 
@@ -93,22 +106,22 @@ void ActivitySheetWriter::writeInterventions(QXlsx::Document &doc, const QString
     }
 }
 
-void ActivitySheetWriter::writeReplacements(QXlsx::Document &doc, const QDate &date, int row, const QList<HardwareReplacement> &replacements)
+void ActivitySheetWriter::writeReplacements(XLWorksheet &doc, const QDate &date, int row, const QList<HardwareReplacement> &replacements)
 {
     // We write count
-    doc.write("C26", replacements.count());
+    doc.cell("C26").value().set(replacements.count());
 
     // We write them row by row
     for (const HardwareReplacement &replacement : replacements) {
-        doc.write(row, 1, replacement.office);
-        doc.write(row, 2, Utils::hardwareTypeString(replacement.type));
-        doc.write(row, 3, date);
-        doc.write(row, 4, replacement.oldSerial);
-        doc.write(row, 5, replacement.quantity);
-        doc.write(row, 6, replacement.location);
-        doc.write(row, 7, replacement.reason);
-        doc.write(row, 8, replacement.newSerial);
-        doc.write(row, 9, Utils::hardwareStatusString(replacement.status));
+        doc.cell(row, 1).value().set(replacement.office.toStdString());
+        doc.cell(row, 2).value().set(Utils::hardwareTypeString(replacement.type).toStdString());
+        doc.cell(row, 3).value().set(date.toString("dd/MM/yyyy").toStdString());
+        doc.cell(row, 4).value().set(replacement.oldSerial.toStdString());
+        doc.cell(row, 5).value().set(replacement.quantity);
+        doc.cell(row, 6).value().set(replacement.location.toStdString());
+        doc.cell(row, 7).value().set(replacement.reason.toStdString());
+        doc.cell(row, 8).value().set(replacement.newSerial.toStdString());
+        doc.cell(row, 9).value().set(Utils::hardwareStatusString(replacement.status).toStdString());
         ++row;
     }
 }

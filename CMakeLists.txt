@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.30)
 
-project(DailyIDCAM VERSION 1.0.2)
+project(DailyIDCAM VERSION 1.1.0)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -9,14 +9,17 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt6 REQUIRED COMPONENTS Core OPTIONAL_COMPONENTS Network)
 qt_standard_project_setup()
 
-# QXlsx
+# OpenXLSX
 include(FetchContent)
-FetchContent_Declare(QXlsx
-    GIT_REPOSITORY https://github.com/QtExcel/QXlsx.git
-    GIT_TAG v1.5.0
-    SOURCE_SUBDIR QXlsx
+FetchContent_Declare(OpenXLSX
+    GIT_REPOSITORY https://github.com/troldal/OpenXLSX.git
+    GIT_TAG 5723411d47643ce3b5b9994064c26ca8cd841f13
 )
-FetchContent_MakeAvailable(QXlsx)
+
+set(OPENXLSX_BUILD_SAMPLES OFF)
+set(OPENXLSX_BUILD_TESTS OFF)
+set(OPENXLSX_CREATE_DOCS OFF)
+FetchContent_MakeAvailable(OpenXLSX)
 
 qt_add_executable(Tool
     main.cpp
@@ -29,7 +32,7 @@ qt_add_executable(Tool
 
 set_target_properties(Tool PROPERTIES OUTPUT_NAME idcam-day)
 
-target_link_libraries(Tool PRIVATE QXlsx)
+target_link_libraries(Tool PRIVATE OpenXLSX)
 
 if (Qt6Network_FOUND)
     target_sources(Tool PRIVATE clockify.h clockify.cpp)

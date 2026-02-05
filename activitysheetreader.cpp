@@ -3,11 +3,12 @@
 #include "utils.h"
 
 #include <QFile>
+#include <QTemporaryFile>
 #include <QRegularExpression>
 
-#include <xlsxdocument.h>
+#include <OpenXLSX.hpp>
 
-using namespace QXlsx;
+using namespace OpenXLSX;
 
 ActivitySheetReader::ActivitySheetReader() {}
 
@@ -21,41 +22,71 @@ ActivitySheet ActivitySheetReader::read(const QString &fileName)
 
 ActivitySheet ActivitySheetReader::read(QIODevice *device)
 {
-    Document doc(device);
-    if (!doc.load())
+    if (!device->isReadable())
+        return ActivitySheet();
+
+    QString fileName;
+
+    // If it's a QFile, we just get the fileName
+    if (device->inherits("QFile")) {
+        QFile *file = qobject_cast<QFile *>(device);
+        fileName = file->fileName();
+    }
+
+    if (fileName.isEmpty() || fileName.startsWith(":")) {
+        QTemporaryFile *temp = new QTemporaryFile(device);
+        if (!temp->open())
+            return ActivitySheet();
+
+        temp->write(device->readAll());
+        temp->flush();
+        temp->reset();
+        fileName = temp->fileName();
+    }
+
+    XLDocument doc(fileName.toStdString());
+    if (!doc.isOpen())
         return ActivitySheet();
 
     ActivitySheet sheet;
     sheet.date = QDate::currentDate();
 
-    int count = doc.dimension().bottomLeft().row();
+    XLWorkbook book = doc.workbook();
+    XLWorksheet excel = book.worksheet(1);
+
+    int count = excel.rowCount();
     for (int row(2); row <= count; ++row) {
-        const QString task = doc.read(row, 4).toString();
+        const std::string task = excel.cell(row, 4).value().getString();
         if (task == "Intervention")
-            sheet.interventions.append(readIntervention(doc, row));
+            sheet.interventions.append(readIntervention(excel, row));
         else if (task == "Remplacement")
-            sheet.replacements.append(readReplacement(doc, row));
+            sheet.replacements.append(readReplacement(excel, row));
     }
 
     return sheet;
 }
 
-Intervention ActivitySheetReader::readIntervention(Document &doc, int row)
+Intervention ActivitySheetReader::readIntervention(XLWorksheet &sheet, int row)
 {
-    const QString fullDescription = doc.read(row, 3).toString();
+    const QString fullDescription = QString::fromStdString(sheet.cell(row, 3).value().getString());
     const int frontier = fullDescription.indexOf(":");
     const QString title = fullDescription.left(frontier);
     const QString description = fullDescription.right(fullDescription.size() - frontier -1);
 
+    auto time = [&sheet](int row, int col) -> QTime {
+        const QString value = QString::fromStdString(sheet.cell(row, col).getString());
+        return QTime::fromString(value, "hh:mm:ss");
+    };
+
     Intervention intervention;
     intervention.title = title.trimmed();
     intervention.description = description.trimmed();
-    intervention.office = doc.read(row, 2).toString();
-    intervention.startTime = doc.read(row, 10).toTime();
-    intervention.endTime = doc.read(row, 12).toTime();
-    intervention.subSystem = Utils::subSystem(doc.read(row, 1).toString());
+    intervention.office = QString::fromStdString(sheet.cell(row, 2).getString());
+    intervention.startTime = time(row, 10);
+    intervention.endTime = time(row, 12);
+    intervention.subSystem = Utils::subSystem(QString::fromStdString(sheet.cell(row, 1).getString()));
 
-    const QStringList tags = doc.read(row, 8).toString().split(", ", Qt::SkipEmptyParts);
+    const QStringList tags = QString::fromStdString(sheet.cell(row, 8).getString()).split(", ", Qt::SkipEmptyParts);
     for (const QString &tag : tags) {
         // First we check if it's not a ticket number
         const QString ticket = Utils::ticketNumber(tag);
@@ -81,7 +112,7 @@ Intervention ActivitySheetReader::readIntervention(Document &doc, int row)
     return intervention;
 }
 
-HardwareReplacement ActivitySheetReader::readReplacement(QXlsx::Document &doc, int row)
+HardwareReplacement ActivitySheetReader::readReplacement(XLWorksheet &sheet, int row)
 {
     HardwareReplacement replacement;
     return replacement;

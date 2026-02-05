@@ -3,8 +3,8 @@
 
 #include <activitysheet.h>
 
-namespace QXlsx {
-class Document;
+namespace OpenXLSX {
+class XLWorksheet;
 }
 
 class ActivitySheetReader
@@ -16,8 +16,8 @@ public:
     ActivitySheet read(QIODevice *device);
 
 private:
-    Intervention readIntervention(QXlsx::Document &doc, int row);
-    HardwareReplacement readReplacement(QXlsx::Document &doc, int row);
+    Intervention readIntervention(OpenXLSX::XLWorksheet &sheet, int row);
+    HardwareReplacement readReplacement(OpenXLSX::XLWorksheet &sheet, int row);
 };
 
 #endif // ACTIVITYSHEETREADER_H
